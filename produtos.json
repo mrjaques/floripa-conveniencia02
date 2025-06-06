@@ -1,0 +1,23 @@
+[
+  {
+    "nome": "Cerveja Brahma Duplo Malte",
+    "preco": "R$ 6.99",
+    "descricao": "Produto para maiores de 18",
+    "imagem": "imagens/brahma.jpg",
+    "categoria": "Cervejas"
+  },
+  {
+    "nome": "Vodka Smirnoff",
+    "preco": "R$ 15.00",
+    "descricao": "Produto para maiores de 18",
+    "imagem": "img/vodka.png",
+    "categoria": "Vodka"
+  },
+  {
+    "nome": "Gin Tanqueray",
+    "preco": "R$ 24.90",
+    "descricao": "Produto para maiores de 18",
+    "imagem": "img/gin.png",
+    "categoria": "Gin"
+  }
+]

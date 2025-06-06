@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Floripa Conveniencias</title>
+    <meta name="description" content="Bebidas premium, cervejas, vinhos, gin, vodka e variedades. Entrega 24 horas em Florianópolis. Compre online na Floripa Conveniencias!">
+    <meta name="keywords" content="bebidas, cerveja, vinho, gin, vodka, conveniência, Floripa, entrega 24h, bebidas premium">
+    <meta name="author" content="Floripa Conveniencias">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://fonts.googleapis.com/css?family=Inter:400,700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- Banner -->
+    <div class="banner">
+        <img src="imagens/banner03.png" alt="Banner da conveniencia" width="300">
+    </div>
+    <!-- Barra de busca -->
+    <div class="search-bar">
+        <input type="text" placeholder="Buscar produtos...">
+    </div>
+
+    <!-- Categorias -->
+    <div class="categories">
+        <!--<button class="category-btn active">Todos</button>-->
+        <button class="category-btn active">Cerveja</button>
+        <button class="category-btn">Agua</button>
+        <button class="category-btn">Refrigerante</button>
+        <button class="category-btn">Destilado</button>
+        <button class="category-btn">Energético</button>
+        <button class="category-btn">Drinks</button>
+        <button class="category-btn">Sucos</button>
+        <button class="category-btn">Vinhos</button>
+        <button class="category-btn">Bomboniere</button>
+    </div>
+
+    <!-- Título da seção -->
+    <div class="section-title">Cervejas</div>
+
+    <div class="products" id="lista-produtos"></div>
+
+    
+
+    <!-- Rodapé -->
+    <div class="footer">
+        <div class="footer-content">
+            <img class="footer-logo" src="imagens/logo.png" alt="Logo">
+            <div>
+                <div class="footer-title">Floripa Conveniencias</div>
+                <div class="footer-desc">Bebidas Premium</div>
+            </div>
+        </div>
+        <div class="footer-cart" tabindex="0" aria-label="Abrir carrinho">🛒</div>
+    </div>
+
+    <!-- Modal de idade -->
+    <div id="age-modal" class="age-modal" role="dialog" aria-modal="true" aria-labelledby="age-modal-title">
+        <div class="age-modal-content">
+            <h2 id="age-modal-title">Você tem 18 anos ou mais?</h2>
+            <p>Para acessar este site, confirme sua idade.</p>
+            <button id="age-yes">Sim, tenho 18+</button>
+            <button id="age-no">Não tenho</button>
+        </div>
+    </div>
+
+    <!-- Modal do Carrinho -->
+    <div id="cart-modal" class="cart-modal" aria-modal="true" aria-labelledby="cart-modal-title">
+        <div class="cart-modal-content">
+            <button id="fechar-carrinho" class="close-cart" aria-label="Fechar">&times;</button>
+            <h2 id="cart-modal-title">Seu Carrinho</h2>
+            <div id="cart-items"></div>
+            <form id="cart-form" autocomplete="off">
+                <label for="cart-nome">Nome</label>
+                <input type="text" id="cart-nome" name="nome" placeholder="Seu nome completo" required>
+                <label for="cart-endereco">Endereço</label>
+                <input type="text" id="cart-endereco" name="endereco" placeholder="Seu endereço completo" required>
+                <label for="cart-pagamento">Forma de Pagamento</label>
+                <select id="cart-pagamento" name="pagamento" required>
+                    <option value="">Selecione uma opção</option>
+                    <option value="Dinheiro">Dinheiro</option>
+                    <option value="Cartão de Crédito">Cartão de Crédito</option>
+                    <option value="Cartão de Débito">Cartão de Débito</option>
+                    <option value="Pix">Pix</option>
+                </select>
+                <div id="cart-total" style="margin:16px 0;font-weight:bold;"></div>
+                <button type="submit" id="finalizar-pedido" class="finalizar-btn">Finalizar Pedido via WhatsApp</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Notificação de produto adicionado -->
+    <div id="cart-toast" style="display:none;position:fixed;top:32px;left:50%;transform:translateX(-50%);background:#111;color:#fff;padding:16px 32px;border-radius:8px;z-index:10000;font-weight:600;font-size:1.1rem;box-shadow:0 2px 12px rgba(0,0,0,0.15);">
+        PRODUTO ADICIONADO AO CARRINHO
+    </div>
+
+    <!-- TESTANDO BUSCA DE PRODUTO VIA JSON -->
+    <!-- <script>
+        let todosProdutos = [];
+
+        async function carregarProdutos() {
+            const resposta = await fetch('produtos.json');
+            todosProdutos = await resposta.json();
+            renderizarProdutos(todosProdutos);
+        }
+
+        function renderizarProdutos(produtos) {
+            const container = document.getElementById('lista-produtos');
+            container.innerHTML = '';
+
+            produtos.forEach(produto => {
+            const card = document.createElement('div');
+            card.className = 'product-card';
+            card.innerHTML = `
+                <img src="${produto.imagem}" alt="${produto.nome}">
+                <div class="name">${produto.nome}</div>
+                <div class="price">${produto.preco}</div>
+                <div class="desc">${produto.descricao}</div>
+                <button class="add-btn">+</button>
+            `;
+            container.appendChild(card);
+            });
+        }
+
+        function aplicarFiltro(categoria) {
+            document.querySelectorAll('.category-btn').forEach(btn => {
+            btn.classList.remove('active');
+            });
+            document.querySelector(`.category-btn[data-categoria="${categoria}"]`).classList.add('active');
+
+            const filtrados = categoria === 'Todos'
+            ? todosProdutos
+            : todosProdutos.filter(p => p.categoria === categoria);
+
+            renderizarProdutos(filtrados);
+        }
+
+        document.querySelectorAll('.category-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+            const categoria = btn.getAttribute('data-categoria');
+            aplicarFiltro(categoria);
+            });
+        });
+
+        carregarProdutos();
+    </script> -->
+
+    <!-- TESTANDO BUSCA DE PRODUTO VIA JSON -->
+
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Modal de idade
+        const modal = document.getElementById('age-modal');
+        const btnYes = document.getElementById('age-yes');
+        const btnNo = document.getElementById('age-no');
+        if (localStorage.getItem('ageConfirmed') !== 'yes') {
+            modal.style.display = 'flex';
+            document.body.style.overflow = 'hidden';
+        } else {
+            modal.style.display = 'none';
+        }
+        btnYes.onclick = function() {
+            localStorage.setItem('ageConfirmed', 'yes');
+            modal.style.display = 'none';
+            document.body.style.overflow = '';
+        };
+        btnNo.onclick = function() {
+            window.location.href = 'https://www.google.com.br';
+        };
+
+        // Produtos por categoria
+        const produtos = {
+            Cerveja: [
+                {
+                    nome: "Cerveja Brahma Duplo Malte",
+                    preco: "R$ 6.99",
+                    imagem: "imagens/brahma.jpg",
+                    desc: "Produto para maiores de 18 anos"
+                },
+                {
+                    nome: "Cerveja Heineken Long Neck",
+                    preco: "R$ 8.90",
+                    imagem: "imagens/heiniken.jpg",
+                    desc: "Produto para maiores de 18 anos"
+                },
+                {
+                    nome: "Cerveja Polar Latão",
+                    preco: "R$ 8.90",
+                    imagem: "imagens/polar.jpg",
+                    desc: "Produto para maiores de 18 anos"
+                },
+                {
+                    nome: "Cerveja Amstel Latão",
+                    preco: "R$ 8.90",
+                    imagem: "imagens/amstel.jpg",
+                    desc: "Produto para maiores de 18 anos"
+                },
+                {
+                    nome: "Cerveja Spaten Lata",
+                    preco: "R$ 8.90",
+                    imagem: "imagens/spaten.jpg",
+                    desc: "Produto para maiores de 18 anos"
+                },
+                {
+                    nome: "Cerveja Budweiser Lata",
+                    preco: "R$ 8.90",
+                    imagem: "imagens/bud.jpg",
+                    desc: "Produto para maiores de 18 anos"
+                },
+                {
+                    nome: "Cerveja Original Lata",
+                    preco: "R$ 8.90",
+                    imagem: "imagens/original.jpg",
+                    desc: "Produto para maiores de 18 anos"
+                },
+                {
+                    nome: "Cerveja Amstel Latão",
+                    preco: "R$ 8.90",
+                    imagem: "imagens/amstel.jpg",
+                    desc: "Produto para maiores de 18 anos"
+                }
+            ],
+            Agua: [
+                {
+                    nome: "Agua Mineral Crystal",
+                    preco: "R$ 5.90",
+                    imagem: "imagens/agua.png",
+                    desc: "Com ou sem gás!"
+                }
+            ],
+            Refrigerante: [
+                {
+                    nome: "Coca-Cola 350ml",
+                    preco: "R$ 4.90",
+                    imagem: "imagens/coca.jpg",
+                    desc: "Sabor original"
+                }
+            ],
+            Destilado: [
+                {
+                    nome: "Vodka Absolut 1L",
+                    preco: "R$ 89.90",
+                    imagem: "imagens/absolut.jpg",
+                    desc: "Produto para maiores de 18 anos"
+                },
+                {
+                    nome: "Gin Tanqueray 750ml",
+                    preco: "R$ 99.90",
+                    imagem: "imagens/tanqueray.jpg",
+                    desc: "Produto para maiores de 18 anos"
+                }
+            ],
+            Energético: [
+                {
+                    nome: "Red Bull 250ml",
+                    preco: "R$ 10.90",
+                    imagem: "imagens/redbull.jpg",
+                    desc: "Produto para maiores de 18 anos"
+                }
+            ],
+            Drinks: [
+                {
+                    nome: "Beats",
+                    preco: "R$ 6,90",
+                    imagem: "imagens/drink.jpg",
+                    desc: "Produto para maiores de 18 anos"
+                }
+            ],
+            Sucos: [
+                {
+                    nome: "Vodka Absolut 1L",
+                    preco: "R$ 89.90",
+                    imagem: "imagens/absolut.jpg",
+                    desc: "Produto para maiores de 18 anos"
+                }
+            ],
+            Vinhos: [
+                {
+                    nome: "Vinho Miolo Seleção 750ml",
+                    preco: "R$ 49.90",
+                    imagem: "imagens/quintamoraes.jpg",
+                    desc: "Produto para maiores de 18 anos"
+                },
+                {
+                    nome: "Vinho Miolo Seleção 750ml",
+                    preco: "R$ 49.90",
+                    imagem: "imagens/quintamoraes.jpg",
+                    desc: "Produto para maiores de 18 anos"
+                }
+            ],
+            Bomboniere: [
+                {
+                    nome: "Energético Red Bull 250ml",
+                    preco: "R$ 9.90",
+                    imagem: "imagens/redbull.jpg",
+                    desc: "Produto para maiores de 18 anos"
+                }
+            ]
+        };
+
+        // Renderização dos produtos
+        const productsDiv = document.querySelector('.products');
+        const sectionTitle = document.querySelector('.section-title');
+        const searchInput = document.querySelector('.search-bar input');
+        const categoryBtns = document.querySelectorAll('.category-btn');
+        let categoriaAtual = 'Cervejas';
+        let carrinho = JSON.parse(localStorage.getItem('carrinho')) || [];
+
+        function renderProdutos(categoria, filtro = '') {
+            productsDiv.innerHTML = '';
+            sectionTitle.textContent = categoria;
+            let lista = produtos[categoria].filter(prod => 
+                prod.nome.toLowerCase().includes(filtro.toLowerCase())
+            );
+            if (lista.length === 0) {
+                productsDiv.innerHTML = '<div style="padding:32px;">Nenhum produto encontrado.</div>';
+                return;
+            }
+            lista.forEach((prod, idx) => {
+                const card = document.createElement('div');
+                card.className = 'product-card';
+                card.innerHTML = `
+                    <button class="add-btn" tabindex="0" aria-label="Adicionar ${prod.nome}" data-idx="${idx}">+</button>
+                    <img src="${prod.imagem}" alt="${prod.nome}">
+                    <div class="name">${prod.nome}</div>
+                    <div class="price">${prod.preco}</div>
+                    <div class="desc">${prod.desc}</div>
+                `;
+                productsDiv.appendChild(card);
+            });
+            addBtnListeners();
+        }
+
+        // Notificação de produto incluso no carrinho
+        function showCartToast() {
+            const toast = document.getElementById('cart-toast');
+            toast.style.display = 'block';
+            toast.style.opacity = '1';
+            setTimeout(() => {
+                toast.style.transition = 'opacity 0.5s';
+                toast.style.opacity = '0';
+                setTimeout(() => {
+                    toast.style.display = 'none';
+                    toast.style.transition = '';
+                    toast.style.opacity = '1';
+                }, 500);
+            }, 1200);
+        }
+
+        // Filtro na busca
+        searchInput.addEventListener('input', function() {
+            renderProdutos(categoriaAtual, searchInput.value);
+        });
+
+        // Troca de categoria
+        categoryBtns.forEach(btn => {
+            btn.addEventListener('click', function() {
+                categoryBtns.forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                categoriaAtual = btn.textContent;
+                searchInput.value = '';
+                renderProdutos(categoriaAtual);
+            });
+        });
+
+        // Carrinho
+        function atualizarCarrinho() {
+            const cartDiv = document.querySelector('.footer-cart');
+            let total = carrinho.reduce((acc, item) => acc + item.qtd, 0);
+            cartDiv.innerHTML = `🛒${total > 0 ? `<span class="cart-badge">${total}</span>` : ''}`;
+            localStorage.setItem('carrinho', JSON.stringify(carrinho));
+        }
+
+        // Modal do carrinho
+        const cartModal = document.getElementById('cart-modal');
+        const cartItemsDiv = document.getElementById('cart-items');
+        const cartTotalDiv = document.getElementById('cart-total');
+        const btnFecharCarrinho = document.getElementById('fechar-carrinho');
+        const cartForm = document.getElementById('cart-form');
+
+        // Abrir modal com animação
+        document.querySelector('.footer-cart').onclick = function() {
+            renderCarrinho();
+            cartModal.classList.add('show');
+            cartModal.querySelector('.cart-modal-content').style.animation = 'slideInCart 0.4s forwards';
+            document.body.style.overflow = 'hidden';
+        };
+
+        // Fechar modal
+        btnFecharCarrinho.onclick = function() {
+            cartModal.classList.remove('show');
+            document.body.style.overflow = '';
+        };
+
+        // Finalizar pedido via WhatsApp
+        cartForm.onsubmit = function(e) {
+            e.preventDefault();
+            // Validação dos campos obrigatórios
+            const nome = document.getElementById('cart-nome').value.trim();
+            const endereco = document.getElementById('cart-endereco').value.trim();
+            const pagamento = document.getElementById('cart-pagamento').value;
+            if (!nome || !endereco || !pagamento) {
+                alert('Preencha todos os campos obrigatórios.');
+                return;
+            }
+            let texto = `*Pedido Floripa Conveniencias*%0A`;
+            carrinho.forEach(item => {
+                texto += `• ${item.nome} x${item.qtd} - ${item.preco}%0A`;
+            });
+            texto += `Total: ${cartTotalDiv.textContent.replace('Total: ', '')}%0A`;
+            texto += `Nome: ${nome}%0AEndereço: ${endereco}%0AForma de Pagamento: ${pagamento}`;
+            window.open(`https://wa.me/5551996277338?text=${texto}`, '_blank');
+            carrinho = [];
+            atualizarCarrinho();
+            cartModal.classList.remove('show');
+            document.body.style.overflow = '';
+            cartForm.reset();
+        };
+
+        function renderCarrinho() {
+    if (carrinho.length === 0) {
+        cartItemsDiv.innerHTML = '<p>Seu carrinho está vazio.</p>';
+        cartTotalDiv.textContent = '';
+        document.getElementById('finalizar-pedido').disabled = true;
+        return;
+    }
+    document.getElementById('finalizar-pedido').disabled = false;
+    cartItemsDiv.innerHTML = carrinho.map((item, idx) => `
+        <div class="cart-item">
+            <div style="flex:1;">
+                <div style="font-weight:600; font-size:18px;">${item.nome}</div>
+                <div style="font-size:15px;color:#6b7280; margin-top:2px;">${item.preco}</div>
+            </div>
+            <input type="number" min="1" value="${item.qtd}" data-idx="${idx}" aria-label="Quantidade" style="margin:0 12px;">
+            <button type="button" class="remove-btn" data-idx="${idx}">Remover</button>
+        </div>
+    `).join('');
+    let total = carrinho.reduce((acc, item) => acc + (parseFloat(item.preco.replace('R$', '').replace(',', '.')) * item.qtd), 0);
+    cartTotalDiv.textContent = 'Total: R$ ' + total.toFixed(2).replace('.', ',');
+
+    // Atualiza quantidade
+    cartItemsDiv.querySelectorAll('input[type="number"]').forEach(input => {
+        input.onchange = function() {
+            let idx = parseInt(this.getAttribute('data-idx'));
+            let val = parseInt(this.value);
+            if (val < 1) val = 1;
+            carrinho[idx].qtd = val;
+            atualizarCarrinho();
+            renderCarrinho();
+        };
+    });
+    // Remover item
+    cartItemsDiv.querySelectorAll('.remove-btn').forEach(btn => {
+        btn.onclick = function() {
+            let idx = parseInt(this.getAttribute('data-idx'));
+            carrinho.splice(idx, 1);
+            atualizarCarrinho();
+            renderCarrinho();
+        };
+    });
+}
+
+        function addBtnListeners() {
+            document.querySelectorAll('.product-card').forEach((card, idx) => {
+                card.onclick = function(e) {
+                    const ageModal = document.getElementById('age-modal');
+                    if (ageModal && ageModal.style.display === 'flex') return;
+                    if (e.target.classList.contains('add-btn')) return;
+                    let prod = produtos[categoriaAtual].filter(prod => 
+                        prod.nome.toLowerCase().includes(searchInput.value.toLowerCase())
+                    )[idx];
+                    let found = carrinho.find(item => item.nome === prod.nome);
+                    if (found) {
+                        found.qtd += 1;
+                    } else {
+                        carrinho.push({ ...prod, qtd: 1 });
+                    }
+                    atualizarCarrinho();
+                    showCartToast(); // <-- Aqui!
+                };
+            });
+            document.querySelectorAll('.add-btn').forEach((btn, idx) => {
+                btn.onclick = function(e) {
+                    e.stopPropagation();
+                    const ageModal = document.getElementById('age-modal');
+                    if (ageModal && ageModal.style.display === 'flex') return;
+                    let prod = produtos[categoriaAtual].filter(prod => 
+                        prod.nome.toLowerCase().includes(searchInput.value.toLowerCase())
+                    )[idx];
+                    let found = carrinho.find(item => item.nome === prod.nome);
+                    if (found) {
+                        found.qtd += 1;
+                    } else {
+                        carrinho.push({ ...prod, qtd: 1 });
+                    }
+                    atualizarCarrinho();
+                    showCartToast(); // <-- Aqui também!
+                };
+            });
+        }
+
+        // Inicialização
+        renderProdutos(categoriaAtual);
+        atualizarCarrinho();
+    });
+    </script>
+</body>
+</html>
