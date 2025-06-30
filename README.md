@@ -59,7 +59,8 @@ Um projeto de **website responsivo** para estabelecimentos como lanchonetes, bar
 1. Clone o repositório:
 
 ```bash
-git clone [https://github.com/seuusuario/seu-repositorio.git](https://github.com/mrjaques/floripa-conveniencia02.git)
+git clone https://github.com/mrjaques/floripa-conveniencia02.git
+
 ```
 
 2. Configure o número do WhatsApp e dados no arquivo de configuração (ex: `config/config.php`).
@@ -73,8 +74,8 @@ git clone [https://github.com/seuusuario/seu-repositorio.git](https://github.com
 
 Dúvidas ou sugestões? Entre em contato:
 
-* WhatsApp: [Clique aqui](https://wa.me/5551996277338)
-* Email: [seuemail@exemplo.com](mailto:mrjaques7@gmail.com)
+* WhatsApp: [Suporte](https://wa.me/5551996277338)
+* Email: [mrjaques7@gmail.com](mailto:mrjaques7@gmail.com)
 
 
 ## 📝 Licença
