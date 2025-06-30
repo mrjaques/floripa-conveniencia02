@@ -1,7 +1,3 @@
-Claro! Abaixo está um exemplo completo de um arquivo `README.md` para seu projeto de **cardápio digital com integração via WhatsApp** e painel admin:
-
----
-
 ````markdown
 # 📱 Cardápio Digital com Integração WhatsApp
 
