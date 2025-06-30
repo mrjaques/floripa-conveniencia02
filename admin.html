@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Painel Admin - Floripa Conveniências</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #4CAF50, #45a049);
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2rem;
+            margin-bottom: 10px;
+        }
+
+        .controls {
+            padding: 20px;
+            background: #f8f9fa;
+            border-bottom: 1px solid #dee2e6;
+            display: flex;
+            gap: 15px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn-primary {
+            background: #007bff;
+            color: white;
+        }
+
+        .btn-success {
+            background: #28a745;
+            color: white;
+        }
+
+        .btn-warning {
+            background: #ffc107;
+            color: #212529;
+        }
+
+        .btn-danger {
+            background: #dc3545;
+            color: white;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+
+        .pedidos-container {
+            padding: 20px;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #666;
+        }
+
+        .pedido-card {
+            background: white;
+            border: 1px solid #dee2e6;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            padding: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            transition: transform 0.2s ease;
+        }
+
+        .pedido-card:hover {
+            transform: translateY(-2px);
+        }
+
+        .pedido-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .pedido-info {
+            flex: 1;
+        }
+
+        .pedido-info h3 {
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .pedido-info p {
+            color: #666;
+            margin-bottom: 3px;
+        }
+
+        .status-badge {
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .status-aguardando {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .status-preparando {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .status-saiu-entrega {
+            background: #d1ecf1;
+            color: #0c5460;
+        }
+
+        .status-entregue {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .status-cancelado {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .pedido-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+            flex-wrap: wrap;
+        }
+
+        .btn-sm {
+            padding: 5px 12px;
+            font-size: 0.9rem;
+        }
+
+        .pedido-details {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 15px;
+        }
+
+        .whatsapp-preview {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            max-width: 400px;
+            width: 90%;
+            z-index: 1000;
+            display: none;
+        }
+
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 999;
+            display: none;
+        }
+
+        @media (max-width: 768px) {
+            .pedido-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .pedido-actions {
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🛍️ Painel de Pedidos</h1>
+            <p>Gerenciar pedidos - Floripa Conveniências</p>
+        </div>
+
+        <div class="controls">
+            <button class="btn btn-primary" onclick="carregarPedidos()">🔄 Atualizar</button>
+            <select id="filtroStatus" onchange="filtrarPedidos()">
+                <option value="">Todos os Status</option>
+                <option value="aguardando">Aguardando</option>
+                <option value="preparando">Preparando</option>
+                <option value="saiu-entrega">Saiu para Entrega</option>
+                <option value="entregue">Entregue</option>
+                <option value="cancelado">Cancelado</option>
+            </select>
+        </div>
+
+        <div class="pedidos-container">
+            <div class="loading" id="loading">
+                🔄 Carregando pedidos...
+            </div>
+            <div id="pedidos-lista"></div>
+        </div>
+    </div>
+
+    <div class="overlay" id="overlay"></div>
+    <div class="whatsapp-preview" id="whatsappPreview">
+        <h3>📱 Mensagem WhatsApp</h3>
+        <div id="mensagemPreview"></div>
+        <div style="margin-top: 15px; display: flex; gap: 10px;">
+            <button class="btn btn-success" onclick="enviarWhatsApp()">Enviar</button>
+            <button class="btn btn-danger" onclick="fecharPreview()">Cancelar</button>
+        </div>
+    </div>
+
+    <script>
+        let pedidos = [];
+        let pedidoAtual = null;
+        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyLHSo45U5QvzWsEIA6YBiHpUY_o5RgxatqmFHg0FbXKQZY_6Avkxz8YsxCWqRLV28v/exec';
+
+        // Carregar pedidos ao iniciar
+        document.addEventListener('DOMContentLoaded', () => {
+            carregarPedidos();
+        });
+
+        async function carregarPedidos() {
+            document.getElementById('loading').style.display = 'block';
+            document.getElementById('pedidos-lista').innerHTML = '';
+
+            try {
+                const response = await fetch(SCRIPT_URL + '?action=getPedidos');
+                const data = await response.json();
+                
+                console.log('Dados recebidos:', data); // Debug
+                
+                if (data.status === 'success') {
+                    pedidos = data.pedidos;
+                    console.log('Pedidos carregados:', pedidos); // Debug
+                    renderizarPedidos(pedidos);
+                } else {
+                    throw new Error(data.message);
+                }
+            } catch (error) {
+                console.error('Erro ao carregar pedidos:', error);
+                document.getElementById('pedidos-lista').innerHTML = 
+                    '<p style="text-align: center; color: #dc3545;">❌ Erro ao carregar pedidos: ' + error.message + '</p>';
+            } finally {
+                document.getElementById('loading').style.display = 'none';
+            }
+        }
+
+        function renderizarPedidos(pedidosParaRender) {
+            const container = document.getElementById('pedidos-lista');
+            
+            if (pedidosParaRender.length === 0) {
+                container.innerHTML = '<p style="text-align: center; color: #666;">📋 Nenhum pedido encontrado</p>';
+                return;
+            }
+
+            container.innerHTML = pedidosParaRender.map(pedido => {
+                // Debug individual do pedido
+                console.log('Renderizando pedido:', pedido);
+                
+                // Tratar data
+                let dataFormatada = 'Data inválida';
+                try {
+                    const data = new Date(pedido.data);
+                    if (!isNaN(data.getTime())) {
+                        dataFormatada = data.toLocaleString('pt-BR');
+                    }
+                } catch (e) {
+                    console.log('Erro ao formatar data:', pedido.data);
+                }
+                
+                // Garantir que os campos não sejam undefined/null
+                const nome = pedido.nome || 'Nome não informado';
+                const endereco = pedido.endereco || 'Endereço não informado';
+                const pagamento = pedido.pagamento || 'Pagamento não informado';
+                const total = pedido.total || 'Total não informado';
+                const itens = pedido.pedido || 'Itens não informados';
+                const status = pedido.status || 'aguardando';
+                
+                return `
+                    <div class="pedido-card">
+                        <div class="pedido-header">
+                            <div class="pedido-info">
+                                <h3>👤 ${nome}</h3>
+                                <p><strong>📅 Data:</strong> ${dataFormatada}</p>
+                                <p><strong>💰 Total:</strong> ${total}</p>
+                                <p><strong>🆔 ID:</strong> ${pedido.id}</p>
+                            </div>
+                            <span class="status-badge status-${status}">${getStatusText(status)}</span>
+                        </div>
+                        
+                        <div class="pedido-details">
+                            <p><strong>📍 Endereço:</strong> ${endereco}</p>
+                            <p><strong>💳 Pagamento:</strong> ${pagamento}</p>
+                            <p><strong>🛒 Itens:</strong> ${itens}</p>
+                        </div>
+                        
+                        <div class="pedido-actions">
+                            ${status === 'aguardando' ? `
+                                <button class="btn btn-success btn-sm" onclick="alterarStatus(${pedido.id}, 'preparando')">
+                                    🍳 Preparando
+                                </button>
+                            ` : ''}
+                            
+                            ${status === 'preparando' ? `
+                                <button class="btn btn-primary btn-sm" onclick="alterarStatus(${pedido.id}, 'saiu-entrega')">
+                                    🚗 Saiu p/ Entrega
+                                </button>
+                            ` : ''}
+                            
+                            ${status === 'saiu-entrega' ? `
+                                <button class="btn btn-success btn-sm" onclick="alterarStatus(${pedido.id}, 'entregue')">
+                                    ✅ Entregue
+                                </button>
+                            ` : ''}
+                            
+                            ${status !== 'cancelado' && status !== 'entregue' ? `
+                                <button class="btn btn-danger btn-sm" onclick="alterarStatus(${pedido.id}, 'cancelado')">
+                                    ❌ Cancelar
+                                </button>
+                            ` : ''}
+                            
+                            <button class="btn btn-warning btn-sm" onclick="prepararMensagem(${pedido.id})">
+                                📱 WhatsApp
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function getStatusText(status) {
+            const statusMap = {
+                'aguardando': 'Aguardando',
+                'preparando': 'Preparando',
+                'saiu-entrega': 'Saiu p/ Entrega',
+                'entregue': 'Entregue',
+                'cancelado': 'Cancelado'
+            };
+            return statusMap[status] || status;
+        }
+
+        async function alterarStatus(pedidoId, novoStatus) {
+            if (!confirm(`Confirma alterar status para "${getStatusText(novoStatus)}"?`)) {
+                return;
+            }
+
+            try {
+                const response = await fetch(SCRIPT_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        action: 'updateStatus',
+                        pedidoId: pedidoId,
+                        novoStatus: novoStatus
+                    })
+                });
+
+                const data = await response.json();
+                
+                if (data.status === 'success') {
+                    // Encontrar o pedido e atualizar status
+                    const pedido = pedidos.find(p => p.id === pedidoId);
+                    if (pedido) {
+                        pedido.status = novoStatus;
+                        renderizarPedidos(pedidos);
+                        
+                        // Preparar mensagem automática
+                        prepararMensagem(pedidoId, true);
+                    }
+                } else {
+                    alert('Erro ao atualizar status: ' + data.message);
+                }
+            } catch (error) {
+                console.error('Erro:', error);
+                alert('Erro ao atualizar status');
+            }
+        }
+
+        function prepararMensagem(pedidoId, autoEnviar = false) {
+            const pedido = pedidos.find(p => p.id === pedidoId);
+            if (!pedido) return;
+
+            pedidoAtual = pedido;
+            
+            const mensagens = {
+                'aguardando': `Olá ${pedido.nome}! 👋\n\nSeu pedido foi recebido e está sendo processado.\n\n📋 *Detalhes do Pedido:*\n${pedido.pedido}\n💰 Total: ${pedido.total}\n\nEm breve entraremos em contato. Obrigado!`,
+                
+                'preparando': `Olá ${pedido.nome}! 👨‍🍳\n\nBoa notícia! Seu pedido já está sendo preparado.\n\n📋 *Itens:*\n${pedido.pedido}\n💰 Total: ${pedido.total}\n\nLogo estará pronto para entrega! 🚗`,
+                
+                'saiu-entrega': `Olá ${pedido.nome}! 🚗💨\n\nSeu pedido saiu para entrega e está a caminho!\n\n📍 *Endereço:* ${pedido.endereco}\n📋 *Pedido:* ${pedido.pedido}\n💰 *Total:* ${pedido.total}\n\nAguarde que já estamos chegando! ⏰`,
+                
+                'entregue': `Olá ${pedido.nome}! ✅\n\nSeu pedido foi entregue com sucesso!\n\nEsperamos que tenha ficado satisfeito. Obrigado pela preferência! 😊\n\n⭐ Avalie nossa loja e ganhe desconto na próxima compra!`,
+                
+                'cancelado': `Olá ${pedido.nome}! 😔\n\nInfelizmente seu pedido foi cancelado.\n\n📋 *Pedido:* ${pedido.pedido}\n\nEntre em contato conosco para mais informações.\nPedimos desculpas pelo inconveniente.`
+            };
+
+            const mensagem = mensagens[pedido.status] || `Olá ${pedido.nome}!\n\nStatus do seu pedido: ${getStatusText(pedido.status)}`;
+            
+            document.getElementById('mensagemPreview').innerHTML = 
+                `<div style="background: #f0f0f0; padding: 15px; border-radius: 8px; white-space: pre-line; font-family: monospace;">${mensagem}</div>`;
+            
+            document.getElementById('overlay').style.display = 'block';
+            document.getElementById('whatsappPreview').style.display = 'block';
+
+            if (autoEnviar) {
+                setTimeout(() => {
+                    enviarWhatsApp();
+                }, 1000);
+            }
+        }
+
+        function enviarWhatsApp() {
+            if (!pedidoAtual) return;
+            
+            const mensagem = document.getElementById('mensagemPreview').textContent;
+            const telefone = '5551996277338'; // Seu número
+            const url = `https://wa.me/${telefone}?text=${encodeURIComponent(mensagem)}`;
+            
+            window.open(url, '_blank');
+            fecharPreview();
+        }
+
+        function fecharPreview() {
+            document.getElementById('overlay').style.display = 'none';
+            document.getElementById('whatsappPreview').style.display = 'none';
+            pedidoAtual = null;
+        }
+
+        function filtrarPedidos() {
+            const filtro = document.getElementById('filtroStatus').value;
+            const pedidosFiltrados = filtro ? 
+                pedidos.filter(p => p.status === filtro) : 
+                pedidos;
+            renderizarPedidos(pedidosFiltrados);
+        }
+
+        // Fechar preview clicando no overlay
+        document.getElementById('overlay').addEventListener('click', fecharPreview);
+    </script>
+</body>
+</html>
+

@@ -392,30 +392,90 @@
             document.body.style.overflow = '';
         };
 
-        // Finalizar pedido via WhatsApp
+        
         cartForm.onsubmit = function(e) {
-            e.preventDefault();
-            // Validação dos campos obrigatórios
-            const nome = document.getElementById('cart-nome').value.trim();
-            const endereco = document.getElementById('cart-endereco').value.trim();
-            const pagamento = document.getElementById('cart-pagamento').value;
-            if (!nome || !endereco || !pagamento) {
-                alert('Preencha todos os campos obrigatórios.');
-                return;
-            }
-            let texto = `*Pedido Floripa Conveniencias*%0A`;
-            carrinho.forEach(item => {
-                texto += `• ${item.nome} x${item.qtd} - ${item.preco}%0A`;
-            });
-            texto += `Total: ${cartTotalDiv.textContent.replace('Total: ', '')}%0A`;
-            texto += `Nome: ${nome}%0AEndereço: ${endereco}%0AForma de Pagamento: ${pagamento}`;
-            window.open(`https://wa.me/5551996277338?text=${texto}`, '_blank');
-            carrinho = [];
-            atualizarCarrinho();
-            cartModal.classList.remove('show');
-            document.body.style.overflow = '';
-            cartForm.reset();
-        };
+        e.preventDefault();
+
+    const nome = document.getElementById('cart-nome').value.trim();
+    const endereco = document.getElementById('cart-endereco').value.trim();
+    const pagamento = document.getElementById('cart-pagamento').value;
+
+    if (!nome || !endereco || !pagamento) {
+        alert('Preencha todos os campos obrigatórios.');
+        return;
+    }
+
+    // Preparar dados para envio
+    const pedidoData = {
+        nome: nome,
+        endereco: endereco,
+        pagamento: pagamento,
+        pedido: carrinho.map(item => `${item.nome} x${item.qtd}`).join(', '),
+        total: cartTotalDiv.textContent.replace('Total: ', '').replace('R$ ', ''),
+        status: 'aguardando',
+        timestamp: new Date().toLocaleString('pt-BR')
+    };
+
+    console.log('Enviando dados:', pedidoData); // Para debug
+
+    // ENVIA PARA GOOGLE SHEETS com melhor tratamento de erro
+    fetch("https://script.google.com/macros/s/AKfycbwfUIS0HrACsK66OigNlTwAvi_SzKqboRRV1__ZPWEqGRW0Nrw575LY8Qhjk-OTp3mD/exec", {
+        method: "POST",
+        mode: 'no-cors', // Importante para Google Apps Script
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify(pedidoData)
+    })
+    .then(response => {
+        console.log('Resposta recebida:', response);
+        
+        // Com no-cors, não conseguimos ler a resposta, então assumimos sucesso
+        // se não houve erro na requisição
+        
+        // Preparar texto para WhatsApp
+        let texto = `*Pedido Floripa Conveniencias*%0A`;
+        carrinho.forEach(item => {
+            texto += `• ${item.nome} x${item.qtd} - ${item.preco}%0A`;
+        });
+        texto += `Total: ${cartTotalDiv.textContent.replace('Total: ', '')}%0A`;
+        texto += `Nome: ${nome}%0AEndereço: ${endereco}%0AForma de Pagamento: ${pagamento}`;
+
+        // Redireciona para o WhatsApp
+        window.open(`https://wa.me/5551996277338?text=${texto}`, '_blank');
+        
+        // Limpar carrinho e fechar modal
+        carrinho = [];
+        atualizarCarrinho();
+        cartModal.classList.remove('show');
+        document.body.style.overflow = '';
+        cartForm.reset();
+        
+        alert('Pedido enviado com sucesso!');
+    })
+    .catch(err => {
+        console.error('Erro detalhado:', err);
+        
+        // Mesmo com erro no Google Sheets, ainda envia para WhatsApp
+        let texto = `*Pedido Floripa Conveniencias*%0A`;
+        carrinho.forEach(item => {
+            texto += `• ${item.nome} x${item.qtd} - ${item.preco}%0A`;
+        });
+        texto += `Total: ${cartTotalDiv.textContent.replace('Total: ', '')}%0A`;
+        texto += `Nome: ${nome}%0AEndereço: ${endereco}%0AForma de Pagamento: ${pagamento}`;
+
+        window.open(`https://wa.me/5551996277338?text=${texto}`, '_blank');
+        
+        carrinho = [];
+        atualizarCarrinho();
+        cartModal.classList.remove('show');
+        document.body.style.overflow = '';
+        cartForm.reset();
+        
+        alert("Pedido enviado para WhatsApp! (Houve problema ao salvar na planilha, mas o pedido foi processado)");
+    });
+};
+
 
         function renderCarrinho() {
     if (carrinho.length === 0) {
@@ -498,6 +558,32 @@
                 };
             });
         }
+
+        // JavaScript que envia para o Apps Script: teste de pedido em planilhas
+            document.getElementById("cart-form").addEventListener("submit", function(e) {
+            e.preventDefault();
+
+            const nome = document.getElementById("cart-nome").value;
+            const endereco = document.getElementById("cart-endereco").value;
+            const telefone = prompt("Digite o número de telefone com DDD (somente números):");
+
+            fetch("SUA_URL_DO_SCRIPT", {
+                method: "POST",
+                body: JSON.stringify({
+                nome: nome,
+                telefone: telefone
+                }),
+                headers: { "Content-Type": "application/json" }
+            })
+            .then(res => res.text())
+            .then(msg => {
+                alert("Pedido enviado com sucesso!");
+                // redireciona para o WhatsApp
+                const mensagem = `Olá, meu nome é ${nome}, fiz um pedido pelo site.`;
+                window.open(`https://wa.me/${telefone}?text=${encodeURIComponent(mensagem)}`, '_blank');
+            });
+            });
+
 
         // Inicialização
         renderProdutos(categoriaAtual);
