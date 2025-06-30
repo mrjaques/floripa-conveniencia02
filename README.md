@@ -3,7 +3,6 @@
 
 Um projeto de **website responsivo** para estabelecimentos como lanchonetes, bares, restaurantes e conveniências que desejam um **cardápio digital simples, rápido e direto ao ponto** — com integração ao WhatsApp para facilitar o pedido do cliente e o recebimento pela loja.
 
----
 
 ## 🚀 Funcionalidades
 
@@ -13,7 +12,6 @@ Um projeto de **website responsivo** para estabelecimentos como lanchonetes, bar
 - 📱 **Design Responsivo**: funciona em celulares, tablets e computadores.
 - 🔐 **Admin Protegido por Senha**.
 
----
 
 ## 🧱 Tecnologias Utilizadas
 
@@ -22,7 +20,6 @@ Um projeto de **website responsivo** para estabelecimentos como lanchonetes, bar
 - **Planilha Excel / JSON / MySQL** (dependendo da versão de armazenamento)
 - **WhatsApp API Link Format**
 
----
 
 ## 🧾 Como Funciona
 
@@ -34,14 +31,12 @@ Um projeto de **website responsivo** para estabelecimentos como lanchonetes, bar
 6. A loja recebe o pedido e organiza a entrega.
 7. O painel admin mostra os pedidos recebidos e permite marcar como entregues, visualizar detalhes e atualizar o cardápio.
 
----
 
 ## 💻 Demonstração
 
 🔗 [Acesse o site de exemplo](https://rapidoo-delivery.netlify.app/)  
 *Obs: versão estática de demonstração. Algumas funcionalidades dinâmicas como pedidos e painel admin podem estar limitadas.*
 
----
 
 ## 📂 Estrutura do Projeto
 
@@ -58,7 +53,6 @@ Um projeto de **website responsivo** para estabelecimentos como lanchonetes, bar
 └── README.md
 ````
 
----
 
 ## ⚙️ Como Instalar
 
@@ -74,7 +68,6 @@ git clone https://github.com/seuusuario/seu-repositorio.git
 
 4. Acesse o painel admin via `seusite.com/admin` e insira suas credenciais.
 
----
 
 ## 📬 Contato
 
@@ -83,7 +76,6 @@ Dúvidas ou sugestões? Entre em contato:
 * WhatsApp: [Clique aqui](https://wa.me/5551996277338)
 * Email: [seuemail@exemplo.com](mailto:mrjaques7@gmail.com)
 
----
 
 ## 📝 Licença
 
