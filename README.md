@@ -40,7 +40,7 @@ Um projeto de **website responsivo** para estabelecimentos como lanchonetes, bar
 
 ## 📂 Estrutura do Projeto
 
-```bash
+```
 /
 ├── index.html               # Página principal com o cardápio
 ├── assets/                  # Imagens, CSS e JS
